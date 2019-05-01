@@ -1,4 +1,5 @@
 /* easySwiper.js */
+/* 上下滚动无缝轮播 */
 const SPEED = 40
 export const EasySwiper = ({
   speed = SPEED, // 速度
@@ -11,15 +12,22 @@ export const EasySwiper = ({
   const idSlideCloneID = !cloneDomId || !isNaN(cloneDomId) ? `${id.toString()}-clone-easy-swiper` : cloneDomId
   const parentSlide = document.getElementById(parentId)
   const idSlide = document.getElementById(id)
+  if (idSlide.offsetHeight <= parentSlide.offsetHeight) return null // 这里父容器的高必须大于子的高
   const idSlideClone = document.createElement(domName) // 应该有个直接Clone的属性的，我忘记了...
   idSlideClone.setAttribute('id', idSlideCloneID)
   idSlideClone.innerHTML = idSlide.innerHTML
   parentSlide.append(idSlideClone)
+  let prevValue = 0
   function Marquee () {
     if (idSlideClone.offsetTop - parentSlide.scrollTop <= 0) {
       parentSlide.scrollTop -= idSlide.offsetHeight
     } else {
-      parentSlide.scrollTop = parentSlide.scrollTop + 1
+      parentSlide.scrollTop += 1
+      if (prevValue === parentSlide.scrollTop) {
+        parentSlide.scrollTop -= idSlide.offsetHeight
+      } else {
+        prevValue = parentSlide.scrollTop
+      }
     }
   }
   let MyMar = setInterval(Marquee, speed)
@@ -29,6 +37,7 @@ export const EasySwiper = ({
   }
   return MyMar
 }
+
 
 // *.vue
 this.MyMarTimer = EasySwiper({
